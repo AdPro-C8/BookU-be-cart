@@ -1,0 +1,57 @@
+name: Continuous Integration (CI)
+
+## Run CI jobs on all branches by default
+on:
+  push:
+  pull_request:
+
+jobs:
+  test:
+    name: Run tests
+    runs-on: ubuntu-22.04
+    
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: booku
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd "pg_isready -d ${POSTGRES_DB} -U ${POSTGRES_USER}"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java toolchain
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "21"
+          cache: "gradle"
+
+      - name: Set gradlew as executable
+        run: chmod +x ./gradlew
+
+      - name: Run unit tests
+        run: ./gradlew test
+        env:
+          PG_HOST: jdbc:postgresql://localhost:5432/booku
+          PG_USER: postgres
+          PG_PASS: postgres
+          PORT: 8000
+
+      - name: Store reports
+        if: failure()
+        uses: actions/upload-artifact@v3
+        with:
+          name: reports
+          path: |
+            **/build/reports/
+            **/build/test-results/
