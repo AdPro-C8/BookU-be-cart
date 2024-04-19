@@ -14,7 +14,7 @@ public class BookCart {
     
     @Id
     @GeneratedValue(strategy=GenerationType.UUID)
-    private UUID cartId;
+    private UUID id;
 
     @Column(nullable = false)
     private UUID userId;
@@ -25,4 +25,12 @@ public class BookCart {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
+
+    @Override
+    public String toString() {
+        return String.format(
+            "BookCart[id=%s, paymentStatus='%s']",
+            id.toString(), paymentStatus.name());
+    }
+
 }
