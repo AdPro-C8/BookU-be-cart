@@ -1,15 +1,8 @@
 package com.adproc8.booku.cart.model;
 
-import java.util.List;
 import java.util.UUID;
 
-import com.adproc8.booku.cart.enums.PaymentStatus;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.validation.constraints.NotNull;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,12 +14,12 @@ public class BookCart {
     @GeneratedValue(strategy=GenerationType.UUID)
     private UUID cartId;
 
-    @NotNull
+    @Column(nullable = false)
     private UUID userId;
 
-    @NotNull
+    @Column(nullable = false)
     private int totalPrice;
 
-    @NotNull
+    @Column(nullable = false)
     private String paymentStatus;
 }
