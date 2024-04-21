@@ -11,7 +11,7 @@ import lombok.Setter;
 
 @Entity
 @Getter @Setter
-public class BookCart {
+public class Cart {
     
     @Id
     @GeneratedValue(strategy=GenerationType.UUID)
