@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 import com.adproc8.booku.cart.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
 import lombok.Getter;
@@ -17,7 +18,8 @@ public class Cart {
     @GeneratedValue(strategy=GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
+    @JsonIgnore
     private UUID userId;
 
     @ManyToMany
