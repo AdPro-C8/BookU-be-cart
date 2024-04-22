@@ -10,12 +10,12 @@ import com.adproc8.booku.cart.model.Cart;
 import com.adproc8.booku.cart.repository.CartRepository;
 
 @Service
-public class CartServiceImpl implements CartService {
+class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
 
     @Autowired
-    public CartServiceImpl(CartRepository cartRepository) {
+    CartServiceImpl(CartRepository cartRepository) {
         this.cartRepository = cartRepository;
     }
 
@@ -25,6 +25,10 @@ public class CartServiceImpl implements CartService {
 
     public Optional<Cart> findById(UUID id) throws IllegalArgumentException {
         return cartRepository.findById(id);
+    }
+
+    public Optional<Cart> findByUserId(UUID userId) {
+        return cartRepository.findByUserId(userId);
     }
 
     public void deleteById(UUID id) throws IllegalArgumentException {
