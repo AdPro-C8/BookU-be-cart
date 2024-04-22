@@ -27,7 +27,7 @@ class CartServiceImpl implements CartService {
         return cartRepository.findById(id);
     }
 
-    public Optional<Cart> findByUserId(UUID userId) {
+    public Optional<Cart> findByUserId(UUID userId) throws IllegalArgumentException {
         return cartRepository.findByUserId(userId);
     }
 
