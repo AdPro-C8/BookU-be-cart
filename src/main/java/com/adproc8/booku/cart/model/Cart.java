@@ -3,7 +3,6 @@ package com.adproc8.booku.cart.model;
 import java.util.List;
 import java.util.UUID;
 
-import com.adproc8.booku.cart.enums.PaymentStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
@@ -27,9 +26,5 @@ public class Cart {
 
     @ManyToMany
     private List<Book> books;
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
 
 }
