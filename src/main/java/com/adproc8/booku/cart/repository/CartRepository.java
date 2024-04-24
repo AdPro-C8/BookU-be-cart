@@ -1,12 +1,9 @@
 package com.adproc8.booku.cart.repository;
 
-import java.util.Optional;
-import java.util.UUID;
-
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.adproc8.booku.cart.model.Cart;
+import com.adproc8.booku.cart.model.CartId;
 
-public interface CartRepository extends JpaRepository<Cart, UUID> {
-    Optional<Cart> findByUserId(UUID userId);
+public interface CartRepository extends JpaRepository<Cart, CartId> {
 }

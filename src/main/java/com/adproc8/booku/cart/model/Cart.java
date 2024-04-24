@@ -11,16 +11,19 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@IdClass(CartId.class)
 @Getter @Setter
 public class Cart {
-    
+
+    @JsonIgnore
     @Id
-    @GeneratedValue(strategy=GenerationType.UUID)
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
     @JsonIgnore
-    private UUID userId;
+    @Id
+    @OneToOne(fetch = FetchType.LAZY)
+    private User user;
 
     @ManyToMany
     private List<Book> books;
@@ -28,12 +31,5 @@ public class Cart {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
-
-    @Override
-    public String toString() {
-        return String.format(
-            "BookCart[id=%s, paymentStatus='%s']",
-            id.toString(), paymentStatus.name());
-    }
 
 }
