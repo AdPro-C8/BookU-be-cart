@@ -16,6 +16,9 @@ public class Checkout {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    private Cart cart;
+
     @Column(nullable = false)
     private String deliveryAddress;
 
