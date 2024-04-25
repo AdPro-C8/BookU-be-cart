@@ -1,6 +1,7 @@
 package com.adproc8.booku.cart.service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,17 @@ class CartServiceImpl implements CartService {
         return cartRepository.save(cart);
     }
 
-    public Optional<Cart> findById(CartId cartId) throws IllegalArgumentException {
-        return cartRepository.findById(cartId);
+    public Optional<Cart> findById(UUID cartId, UUID userId) throws IllegalArgumentException {
+        CartId cartIdObject = new CartId();
+        cartIdObject.setId(cartId);
+        cartIdObject.setUserId(userId);
+        return cartRepository.findById(cartIdObject);
     }
 
-    public void deleteById(CartId cartId) throws IllegalArgumentException {
-        cartRepository.deleteById(cartId);
+    public void deleteById(UUID cartId, UUID userId) throws IllegalArgumentException {
+        CartId cartIdObject = new CartId();
+        cartIdObject.setId(cartId);
+        cartIdObject.setUserId(userId);
+        cartRepository.deleteById(cartIdObject);
     }
 }
