@@ -1,6 +1,6 @@
 package com.adproc8.booku.cart.model;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.UUID;
 
 import jakarta.persistence.*;
@@ -41,12 +41,5 @@ public class Book {
 
     @Column(nullable = false)
     private boolean isAvailable;
-
-    @Override
-    public String toString() {
-        return String.format(
-            "Book[id=%s, title='%s', author='%s', publisher='%s', price='%d', publishDate='%s', isbn='%s', pageCount='%d', photoUrl='%s']",
-            id.toString(), title, author, publisher.toString(), price, publishDate.toString(), isbn, pageCount, photoUrl);
-    }
 
 }
