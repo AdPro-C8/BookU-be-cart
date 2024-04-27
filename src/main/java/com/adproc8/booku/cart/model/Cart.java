@@ -10,19 +10,20 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter @Setter @Builder
+@NoArgsConstructor @AllArgsConstructor
 public class Cart {
 
-    @JsonIgnore
     @EmbeddedId
     private Id id;
 
-    @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId("userId")
+    @JsonIgnore
     private User user;
 
     @ManyToMany
@@ -30,7 +31,7 @@ public class Cart {
 
     @Embeddable
     @Getter @Setter
-    @AllArgsConstructor
+    @NoArgsConstructor @AllArgsConstructor
     public static class Id implements Serializable {
         private UUID cartId;
         private UUID userId;
