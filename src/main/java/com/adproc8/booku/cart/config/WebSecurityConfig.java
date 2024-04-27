@@ -5,12 +5,13 @@ import java.util.NoSuchElementException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.crypto.scrypt.SCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
 import com.adproc8.booku.cart.model.User;
@@ -31,31 +32,34 @@ class WebSecurityConfig {
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		http
 				.authorizeHttpRequests((requests) -> requests
-						.requestMatchers("/cart/**").permitAll()
 						.anyRequest().authenticated())
-				.formLogin((form) -> form
-						.loginPage("/login")
-						.permitAll())
-				.logout((logout) -> logout.permitAll());
+				.formLogin(Customizer.withDefaults())
+				.logout(Customizer.withDefaults())
+				.csrf((csrf) -> csrf.disable());
 
 		return http.build();
 	}
 
 	@Bean
 	PasswordEncoder passwordEncoder() {
-		return SCryptPasswordEncoder.defaultsForSpringSecurity_v5_8();
+		return new BCryptPasswordEncoder();
 	}
 
 	@Bean
-	public UserDetailsService userDetailsService() throws NoSuchElementException {
+	UserDetailsService userDetailsService() {
 		return new UserDetailsService() {
-			public UserDetails loadUserByUsername(String username) {
+			public UserDetails loadUserByUsername(String username)
+				throws NoSuchElementException
+			{
 				User user = userRepository.findByUsername(username).orElseThrow();
-				return org.springframework.security.core.userdetails.User.builder()
+				UserDetails userDetails =
+					org.springframework.security.core.userdetails.User.builder()
 						.username(user.getUsername())
-						.password(passwordEncoder().encode(user.getPassword()))
+						.password(user.getPassword())
 						.roles(user.getRole())
 						.build();
+
+				return userDetails;
 			}
 		};
 	}
