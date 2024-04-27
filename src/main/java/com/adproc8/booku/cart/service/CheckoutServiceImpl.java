@@ -20,6 +20,9 @@ public class CheckoutServiceImpl implements CheckoutService {
     }
 
     public Checkout save(Checkout checkout) throws IllegalArgumentException {
+        if (checkout.getDeliveryAddress().isEmpty())
+            throw new IllegalArgumentException("Delivery address cannot be empty");
+            
         return checkoutRepository.save(checkout);
     }
 
