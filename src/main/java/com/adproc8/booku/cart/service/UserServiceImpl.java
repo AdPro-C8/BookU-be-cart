@@ -4,6 +4,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.adproc8.booku.cart.model.User;
@@ -13,13 +14,19 @@ import com.adproc8.booku.cart.repository.UserRepository;
 class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    UserServiceImpl(UserRepository userRepository) {
+    UserServiceImpl(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public User save(User user) throws IllegalArgumentException {
+        String plainPassword = user.getPassword();
+        String encodedPassword = passwordEncoder.encode(plainPassword);
+        user.setPassword(encodedPassword);
+
         return userRepository.save(user);
     }
 
