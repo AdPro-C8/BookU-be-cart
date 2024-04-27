@@ -1,10 +1,13 @@
 package com.adproc8.booku.cart.model;
 
+import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -14,7 +17,7 @@ public class Cart {
 
     @JsonIgnore
     @EmbeddedId
-    private CartId id;
+    private Id id;
 
     @JsonIgnore
     @OneToOne(fetch = FetchType.LAZY)
@@ -24,4 +27,11 @@ public class Cart {
     @ManyToMany
     private List<Book> books;
 
+    @Embeddable
+    @Getter @Setter
+    @AllArgsConstructor
+    public static class Id implements Serializable {
+        private UUID cartId;
+        private UUID userId;
+    }
 }

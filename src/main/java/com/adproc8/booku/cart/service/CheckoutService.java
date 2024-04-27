@@ -8,5 +8,4 @@ import com.adproc8.booku.cart.model.Checkout;
 public interface CheckoutService {
     Checkout save(Checkout checkout);
     Optional<Checkout> findById(UUID id);
-    Optional<Checkout> findByCartId(UUID cartId, UUID userId);
 }
