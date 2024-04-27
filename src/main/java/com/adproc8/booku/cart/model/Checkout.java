@@ -3,13 +3,15 @@ package com.adproc8.booku.cart.model;
 import java.util.UUID;
 
 import com.adproc8.booku.cart.enums.PaymentStatus;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
+@Getter @Setter @Builder
 public class Checkout {
 
     @Id
@@ -17,6 +19,7 @@ public class Checkout {
     private UUID id;
 
     @OneToOne(fetch = FetchType.LAZY)
+    @JsonIgnore
     private Cart cart;
 
     @Column(nullable = false)
@@ -25,5 +28,4 @@ public class Checkout {
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
-
 }

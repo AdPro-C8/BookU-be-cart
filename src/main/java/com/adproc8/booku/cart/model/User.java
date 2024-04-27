@@ -6,12 +6,13 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
 @Table(name = "users")
-@Getter @Setter
+@Getter @Setter @Builder
 public class User {
 
     @Id
@@ -33,5 +34,4 @@ public class User {
     @OneToOne(cascade = CascadeType.ALL, mappedBy = "user", fetch = FetchType.LAZY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private Cart cart;
-
 }

@@ -4,11 +4,12 @@ import java.util.Date;
 import java.util.UUID;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
 @Entity
-@Getter @Setter
+@Getter @Setter @Builder
 public class Book {
 
     @Id
@@ -41,5 +42,4 @@ public class Book {
 
     @Column(nullable = false)
     private boolean isAvailable;
-
 }
