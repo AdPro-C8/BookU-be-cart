@@ -34,7 +34,7 @@ class CheckoutController {
     }
 
     @GetMapping("/{checkoutId}")
-    Checkout findCheckoutById(
+    Checkout getCheckoutById(
         @PathVariable UUID checkoutId,
         @AuthenticationPrincipal UserDetails userDetails)
     {
@@ -54,7 +54,7 @@ class CheckoutController {
     }
 
     @PostMapping("")
-    Checkout saveCheckout(
+    Checkout postCheckout(
         @RequestBody CheckoutForm form,
         @AuthenticationPrincipal UserDetails userDetails)
     {
