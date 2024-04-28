@@ -26,7 +26,7 @@ public class Cart {
     @JsonIgnore
     private User user;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     private List<Book> books;
 
     @Embeddable
@@ -35,5 +35,9 @@ public class Cart {
     public static class Id implements Serializable {
         private UUID cartId;
         private UUID userId;
+
+        public Id(UUID cartId) {
+            this.cartId = cartId;
+        }
     }
 }
