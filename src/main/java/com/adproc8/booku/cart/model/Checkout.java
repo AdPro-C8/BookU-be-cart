@@ -30,5 +30,6 @@ public class Checkout {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private PaymentStatus paymentStatus;
+    @Builder.Default
+    private PaymentStatus paymentStatus = PaymentStatus.PENDING;
 }
