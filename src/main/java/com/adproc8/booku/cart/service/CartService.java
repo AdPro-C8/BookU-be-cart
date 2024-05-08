@@ -7,7 +7,7 @@ import com.adproc8.booku.cart.model.Cart;
 
 public interface CartService {
     Cart save(Cart cart);
-    Optional<Cart> findById(UUID cartId, UUID userId);
-    Optional<Cart> findByUserId(UUID userId);
-    void deleteById(UUID cartId, UUID userId);
+    Optional<Cart> findById(UUID cartId, String username);
+    Optional<Cart> findByUsername(String username);
+    void deleteById(UUID cartId, String username);
 }

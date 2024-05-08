@@ -21,10 +21,9 @@ public class Cart {
     @EmbeddedId
     private Id id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
     @JsonIgnore
-    private User user;
+    @Column(insertable=false, updatable=false)
+    private String username;
 
     @ManyToMany(fetch = FetchType.LAZY)
     private List<Book> books;
@@ -33,11 +32,11 @@ public class Cart {
     @Getter @Setter
     @NoArgsConstructor @AllArgsConstructor
     public static class Id implements Serializable {
-        private UUID cartId;
-        private UUID userId;
 
-        public Id(UUID cartId) {
-            this.cartId = cartId;
-        }
+        @Column(unique = true)
+        private UUID cartId;
+
+        @Column(unique = true)
+        private String username;
     }
 }

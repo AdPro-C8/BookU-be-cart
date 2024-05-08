@@ -11,41 +11,31 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.adproc8.booku.cart.model.Cart;
-import com.adproc8.booku.cart.model.User;
 import com.adproc8.booku.cart.service.CartService;
-import com.adproc8.booku.cart.service.UserService;
 
 @RestController
 @RequestMapping("/cart")
 class CartController {
 
     private final CartService cartService;
-    private final UserService userService;
 
     @Autowired
-    CartController(CartService cartService, UserService userService) {
+    CartController(CartService cartService) {
         this.cartService = cartService;
-        this.userService = userService;
     }
 
-    @GetMapping("")
+    @GetMapping
     Cart getCart(@AuthenticationPrincipal UserDetails userDetails) {
-        User user = userService
-            .findByUsername(userDetails.getUsername())
-            .orElseThrow();
-        UUID userId = user.getId();
+        String username = userDetails.getUsername();
 
-        Cart cart = user.getCart();
-
-        if (cart == null) {
-            cart = Cart.builder()
-                .id(new Cart.Id(UUID.randomUUID(), userId))
-                .user(user)
-                .books(List.of())
-                .build();
-            user.setCart(cart);
-            userService.save(user);
-        }
+        Cart cart = cartService.findByUsername(username)
+            .orElseGet(() -> {
+                Cart newCart = Cart.builder()
+                    .id(new Cart.Id(UUID.randomUUID(), username))
+                    .books(List.of())
+                    .build();
+                return cartService.save(newCart);
+            });
 
         return cart;
     }

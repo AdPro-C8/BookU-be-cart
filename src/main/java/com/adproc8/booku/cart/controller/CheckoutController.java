@@ -17,20 +17,20 @@ import com.adproc8.booku.cart.enums.PaymentStatus;
 import com.adproc8.booku.cart.form.CheckoutForm;
 import com.adproc8.booku.cart.model.Cart;
 import com.adproc8.booku.cart.model.Checkout;
+import com.adproc8.booku.cart.service.CartService;
 import com.adproc8.booku.cart.service.CheckoutService;
-import com.adproc8.booku.cart.service.UserService;
 
 @RestController
 @RequestMapping("/checkout")
 class CheckoutController {
 
     private final CheckoutService checkoutService;
-    private final UserService userService;
+    private final CartService cartService;
 
     @Autowired
-    CheckoutController(CheckoutService checkoutService, UserService userService) {
+    CheckoutController(CheckoutService checkoutService, CartService cartService) {
         this.checkoutService = checkoutService;
-        this.userService = userService;
+        this.cartService = cartService;
     }
 
     @GetMapping("/{checkoutId}")
@@ -38,34 +38,36 @@ class CheckoutController {
         @PathVariable UUID checkoutId,
         @AuthenticationPrincipal UserDetails userDetails)
     {
-        String username = userDetails.getUsername();
-
-        Checkout checkout = checkoutService.findById(checkoutId)
+        Checkout checkout = checkoutService
+            .findById(checkoutId)
             .orElseThrow();
-
-        String checkoutOwnerName = checkout.getCart()
-            .getUser()
+        String checkoutOwnerName = checkout
+            .getCart()
+            .getId()
             .getUsername();
 
-        if (!checkoutOwnerName.equals(username))
+        String username = userDetails.getUsername();
+
+        if (!username.equals(checkoutOwnerName))
             throw new NoSuchElementException("No value present");
 
         return checkout;
     }
 
-    @PostMapping("")
+    @PostMapping
     Checkout postCheckout(
         @RequestBody CheckoutForm form,
         @AuthenticationPrincipal UserDetails userDetails)
     {
-        Cart cart = userService
+        Cart cart = cartService
             .findByUsername(userDetails.getUsername())
-            .orElseThrow()
-            .getCart();
+            .orElseThrow();
+
+        String deliveryAddress = form.getDeliveryAddress();
 
         Checkout newCheckout = Checkout.builder()
             .cart(cart)
-            .deliveryAddress(form.getDeliveryAddress())
+            .deliveryAddress(deliveryAddress)
             .paymentStatus(PaymentStatus.PENDING)
             .build();
 
