@@ -17,15 +17,16 @@ import java.util.List;
 @EnableWebSecurity
 class SecurityConfiguration {
 
-    private static final List<String> patternsThatRequireAuth = List.of(
-        "/auth/**",
-        "/book/**"
-    );
-
+    private final List<String> permittedPatterns;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
+
+        permittedPatterns = List.of(
+            "/auth/**",
+            "/book/**"
+        );
     }
 
     @Bean
@@ -33,7 +34,7 @@ class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(customizer -> customizer
-                        .requestMatchers(patternsThatRequireAuth.toArray(String[]::new))
+                        .requestMatchers(permittedPatterns.toArray(String[]::new))
                         .permitAll()
                         .anyRequest()
                         .authenticated()
