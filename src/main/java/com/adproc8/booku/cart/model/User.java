@@ -6,10 +6,14 @@ import java.util.UUID;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-@Getter @Setter
+@Getter @Setter @Builder
+@NoArgsConstructor @AllArgsConstructor
 public class User implements UserDetails {
     private UUID id;
     private String username;

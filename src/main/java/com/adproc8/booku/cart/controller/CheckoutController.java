@@ -54,7 +54,7 @@ class CheckoutController {
         return checkout;
     }
 
-    @PostMapping
+    @PostMapping("")
     Checkout postCheckout(
         @RequestBody CheckoutForm form,
         @AuthenticationPrincipal UserDetails userDetails)

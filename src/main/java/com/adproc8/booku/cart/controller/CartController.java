@@ -24,7 +24,7 @@ class CartController {
         this.cartService = cartService;
     }
 
-    @GetMapping
+    @GetMapping("")
     Cart getCart(@AuthenticationPrincipal User userDetails) {
         String username = userDetails.getUsername();
 
