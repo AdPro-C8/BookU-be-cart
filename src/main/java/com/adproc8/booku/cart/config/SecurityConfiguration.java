@@ -17,16 +17,10 @@ import java.util.List;
 @EnableWebSecurity
 class SecurityConfiguration {
 
-    private final List<String> permittedPatterns;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
     SecurityConfiguration(JwtAuthenticationFilter jwtAuthenticationFilter) {
         this.jwtAuthenticationFilter = jwtAuthenticationFilter;
-
-        permittedPatterns = List.of(
-            "/auth/**",
-            "/book/**"
-        );
     }
 
     @Bean
@@ -34,8 +28,9 @@ class SecurityConfiguration {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(customizer -> customizer
-                        .requestMatchers(permittedPatterns.toArray(String[]::new))
-                        .permitAll()
+                        // Uncomment to permit all requests to /cart without authentication
+                        // .requestMatchers("/cart/**")
+                        // .permitAll()
                         .anyRequest()
                         .authenticated()
                 )
