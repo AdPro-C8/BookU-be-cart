@@ -1,72 +1,65 @@
 package com.adproc8.booku.cart.controller;
 
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.adproc8.booku.cart.enums.PaymentStatus;
-import com.adproc8.booku.cart.form.CheckoutForm;
-import com.adproc8.booku.cart.model.Cart;
+import com.adproc8.booku.cart.dto.CheckoutRequestDto;
 import com.adproc8.booku.cart.model.Checkout;
+import com.adproc8.booku.cart.model.User;
 import com.adproc8.booku.cart.service.CheckoutService;
-import com.adproc8.booku.cart.service.UserService;
 
 @RestController
 @RequestMapping("/checkout")
 class CheckoutController {
 
     private final CheckoutService checkoutService;
-    private final UserService userService;
 
     @Autowired
-    CheckoutController(CheckoutService checkoutService, UserService userService) {
+    CheckoutController(CheckoutService checkoutService) {
         this.checkoutService = checkoutService;
-        this.userService = userService;
     }
 
     @GetMapping("/{checkoutId}")
-    Checkout getCheckoutById(
+    ResponseEntity<Checkout> getCheckoutById(
         @PathVariable UUID checkoutId,
-        @AuthenticationPrincipal UserDetails userDetails)
+        @AuthenticationPrincipal User user)
     {
-        String username = userDetails.getUsername();
-
-        Checkout checkout = checkoutService.findById(checkoutId)
+        Checkout checkout = checkoutService
+            .findById(checkoutId)
             .orElseThrow();
+        UUID checkoutOwnerId = checkout
+            .getCart()
+            .getUserId();
 
-        String checkoutOwnerName = checkout.getCart()
-            .getUser()
-            .getUsername();
+        UUID userId = user.getId();
 
-        if (!checkoutOwnerName.equals(username))
-            throw new NoSuchElementException("No value present");
+        if (!userId.equals(checkoutOwnerId))
+            return ResponseEntity.notFound().build();
 
-        return checkout;
+        return ResponseEntity.ok(checkout);
     }
 
     @PostMapping("")
+    @ResponseStatus(HttpStatus.OK)
     Checkout postCheckout(
-        @RequestBody CheckoutForm form,
-        @AuthenticationPrincipal UserDetails userDetails)
+        @RequestBody CheckoutRequestDto checkoutDto,
+        @AuthenticationPrincipal User user)
     {
-        Cart cart = userService
-            .findByUsername(userDetails.getUsername())
-            .orElseThrow()
-            .getCart();
+        String deliveryAddress = checkoutDto.getDeliveryAddress();
 
         Checkout newCheckout = Checkout.builder()
-            .cart(cart)
-            .deliveryAddress(form.getDeliveryAddress())
-            .paymentStatus(PaymentStatus.PENDING)
+            .deliveryAddress(deliveryAddress)
             .build();
 
         checkoutService.save(newCheckout);

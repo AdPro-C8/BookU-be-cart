@@ -23,15 +23,15 @@ class CartServiceImpl implements CartService {
         return cartRepository.save(cart);
     }
 
-    public Optional<Cart> findById(UUID cartId, UUID userId) throws IllegalArgumentException {
-        return cartRepository.findById(new Cart.Id(cartId, userId));
+    public Optional<Cart> findById(UUID cartId) throws IllegalArgumentException {
+        return cartRepository.findById(cartId);
     }
 
     public Optional<Cart> findByUserId(UUID userId) throws IllegalArgumentException {
         return cartRepository.findByUserId(userId);
     }
 
-    public void deleteById(UUID cartId, UUID userId) throws IllegalArgumentException {
-        cartRepository.deleteById(new Cart.Id(cartId, userId));
+    public void deleteById(UUID cartId) throws IllegalArgumentException {
+        cartRepository.deleteById(cartId);
     }
 }

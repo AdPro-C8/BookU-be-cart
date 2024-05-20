@@ -1,8 +1,8 @@
-package com.adproc8.booku.cart.form;
+package com.adproc8.booku.cart.dto;
 
 import lombok.Getter;
 
 @Getter
-public class CheckoutForm {
+public class CheckoutRequestDto {
     private String deliveryAddress;
 }

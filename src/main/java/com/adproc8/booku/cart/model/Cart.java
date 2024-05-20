@@ -1,43 +1,33 @@
 package com.adproc8.booku.cart.model;
 
-import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Getter @Setter @Builder
 @NoArgsConstructor @AllArgsConstructor
 public class Cart {
 
-    @EmbeddedId
-    private Id id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @MapsId("userId")
-    @JsonIgnore
-    private User user;
+    @Column(nullable = false, unique = true)
+    private UUID userId;
 
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<Book> books;
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    @OneToOne(mappedBy = "cart", fetch = FetchType.LAZY)
+    private Checkout checkout;
 
-    @Embeddable
-    @Getter @Setter
-    @NoArgsConstructor @AllArgsConstructor
-    public static class Id implements Serializable {
-        private UUID cartId;
-        private UUID userId;
-
-        public Id(UUID cartId) {
-            this.cartId = cartId;
-        }
-    }
+    @Builder.Default
+    @Transient
+    private List<Book> books = List.of();
 }
