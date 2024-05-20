@@ -15,18 +15,22 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.adproc8.booku.cart.dto.CheckoutRequestDto;
+import com.adproc8.booku.cart.model.Cart;
 import com.adproc8.booku.cart.model.Checkout;
 import com.adproc8.booku.cart.model.User;
+import com.adproc8.booku.cart.service.CartService;
 import com.adproc8.booku.cart.service.CheckoutService;
 
 @RestController
 @RequestMapping("/checkout")
 class CheckoutController {
 
+    private final CartService cartService;
     private final CheckoutService checkoutService;
 
     @Autowired
-    CheckoutController(CheckoutService checkoutService) {
+    CheckoutController(CartService cartService, CheckoutService checkoutService) {
+        this.cartService = cartService;
         this.checkoutService = checkoutService;
     }
 
@@ -58,8 +62,13 @@ class CheckoutController {
     {
         String deliveryAddress = checkoutDto.getDeliveryAddress();
 
+        Cart cart = cartService
+            .findByUserId(user.getId())
+            .orElseThrow();
+
         Checkout newCheckout = Checkout.builder()
             .deliveryAddress(deliveryAddress)
+            .cart(cart)
             .build();
 
         checkoutService.save(newCheckout);
