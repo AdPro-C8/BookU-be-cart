@@ -1,11 +1,9 @@
 package com.adproc8.booku.cart.model;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
-
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,12 +20,14 @@ public class Cart {
     @Column(nullable = false, unique = true)
     private UUID userId;
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
     @OneToOne(mappedBy = "cart", fetch = FetchType.LAZY)
     private Checkout checkout;
 
+    @ElementCollection
     @Builder.Default
+    private Set<UUID> bookIds = new HashSet<>();
+
     @Transient
+    @Builder.Default
     private List<Book> books = List.of();
 }
