@@ -13,6 +13,7 @@ import org.springframework.web.client.RestClientResponseException;
 
 import com.adproc8.booku.cart.dto.CreatePurchaseDetailsRequestDto;
 import com.adproc8.booku.cart.dto.CreatePurchaseDetailsResponseDto;
+import com.adproc8.booku.cart.dto.UpdatePurchaseDetailsRequestDto;
 import com.adproc8.booku.cart.model.Cart;
 import com.adproc8.booku.cart.model.PurchaseDetails;
 import com.adproc8.booku.cart.model.User;
@@ -90,7 +91,7 @@ class PurchaseDetailsController {
     }
 
     @DeleteMapping("/{purchaseDetailsId}")
-    ResponseEntity<Void> deletePurchaseDetails(
+    ResponseEntity<Void> deletePurchaseDetailsById(
         @PathVariable UUID purchaseDetailsId,
         @AuthenticationPrincipal User user)
     {
@@ -106,6 +107,34 @@ class PurchaseDetailsController {
             return ResponseEntity.notFound().build();
 
         purchaseDetailsService.deleteById(purchaseDetailsId);
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PatchMapping("/{purchaseDetailsId}")
+    ResponseEntity<Void> updatePurchaseDetailsById(
+        @PathVariable UUID purchaseDetailsId,
+        @AuthenticationPrincipal User user,
+        @RequestBody UpdatePurchaseDetailsRequestDto purchaseDetailsDto)
+    {
+        PurchaseDetails purchaseDetails = purchaseDetailsService
+                .findById(purchaseDetailsId)
+                .orElseThrow();
+                
+        UUID purchaseDetailsUserId = purchaseDetails
+                .getCart()
+                .getUserId();
+        UUID userId = user.getId();
+
+        if (!userId.equals(purchaseDetailsUserId))
+            return ResponseEntity.notFound().build();
+
+        Optional.ofNullable(purchaseDetailsDto.getDeliveryAddress())
+                .ifPresent(deliveryAddress -> purchaseDetails.setDeliveryAddress(deliveryAddress));
+        Optional.ofNullable(purchaseDetailsDto.getPaymentStatus())
+                .ifPresent(paymentStatus -> purchaseDetails.setPaymentStatus(paymentStatus));
+
+        purchaseDetailsService.save(purchaseDetails);
 
         return ResponseEntity.ok().build();
     }
