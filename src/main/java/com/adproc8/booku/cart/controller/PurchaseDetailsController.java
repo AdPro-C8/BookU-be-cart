@@ -6,6 +6,8 @@ import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -81,7 +83,12 @@ class PurchaseDetailsController {
                 .cart(cart)
                 .build();
 
-        purchaseDetails = purchaseDetailsService.save(purchaseDetails);
+        try {
+            purchaseDetails = purchaseDetailsService.save(purchaseDetails);
+        } catch (DataIntegrityViolationException exception) {
+            logger.error(exception.getMessage(), exception);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
 
         UUID purchaseDetailsId = purchaseDetails.getId();
         CreatePurchaseDetailsResponseDto responseDto =
