@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import com.adproc8.booku.cart.dto.BookIdsDto;
 import com.adproc8.booku.cart.model.Book;
@@ -39,7 +40,9 @@ class CartServiceImpl implements CartService {
         getBooksByIdEndpoint = bookListHost + BOOK_GET_BATCH_PATH;
     }
 
-    private List<Book> findBooksByCart(Cart cart, String authHeader) {
+    private List<Book> findBooksByCart(Cart cart, String authHeader)
+    throws RestClientResponseException
+    {
         List<Book> books = restClient.post()
                 .uri(getBooksByIdEndpoint)
                 .header("Authorization", authHeader)
@@ -51,7 +54,9 @@ class CartServiceImpl implements CartService {
         return books;
     }
 
-    public Cart save(Cart cart, String authHeader) throws IllegalArgumentException {
+    public Cart save(Cart cart, String authHeader)
+    throws RestClientResponseException
+    {
         List<Book> books = findBooksByCart(cart, authHeader);
         Set<UUID> bookIds = books.stream()
                 .map(Book::getId)
@@ -84,7 +89,7 @@ class CartServiceImpl implements CartService {
     }
 
     public Cart findByUserId(UUID userId, String authHeader)
-    throws IllegalArgumentException
+    throws IllegalArgumentException, RestClientResponseException
     {
         Optional<Cart> result = cartRepository.findByUserId(userId);
 
