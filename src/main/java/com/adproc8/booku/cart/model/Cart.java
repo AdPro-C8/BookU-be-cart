@@ -21,7 +21,7 @@ public class Cart {
     private UUID userId;
 
     @OneToOne(mappedBy = "cart", fetch = FetchType.LAZY)
-    private PurchaseDetails purchaseDetails;
+    private PaymentDetails paymentDetails;
 
     @ElementCollection
     @Builder.Default

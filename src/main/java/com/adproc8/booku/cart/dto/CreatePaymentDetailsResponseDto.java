@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor @AllArgsConstructor
-public class CreatePurchaseDetailsResponseDto {
-    private UUID purchaseDetailsId;
+public class CreatePaymentDetailsResponseDto {
+    private UUID paymentDetailsId;
 }

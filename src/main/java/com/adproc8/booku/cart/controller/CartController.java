@@ -15,7 +15,7 @@ import org.springframework.web.client.RestClientResponseException;
 import com.adproc8.booku.cart.dto.BookIdsDto;
 import com.adproc8.booku.cart.dto.GetCartResponseDto;
 import com.adproc8.booku.cart.model.Cart;
-import com.adproc8.booku.cart.model.PurchaseDetails;
+import com.adproc8.booku.cart.model.PaymentDetails;
 import com.adproc8.booku.cart.model.User;
 import com.adproc8.booku.cart.service.CartService;
 
@@ -50,8 +50,8 @@ class CartController {
         GetCartResponseDto cartDto = GetCartResponseDto.builder()
                 .cartId(cart.getId())
                 .userId(userId)
-                .purchaseDetailsId(Optional.ofNullable(cart.getPurchaseDetails())
-                        .map(PurchaseDetails::getId)
+                .paymentDetailsId(Optional.ofNullable(cart.getPaymentDetails())
+                        .map(PaymentDetails::getId)
                         .orElse(null))
                 .books(cart.getBooks())
                 .build();

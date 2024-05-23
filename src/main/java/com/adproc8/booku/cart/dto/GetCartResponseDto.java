@@ -12,6 +12,6 @@ import lombok.Getter;
 public class GetCartResponseDto {
     private UUID cartId;
     private UUID userId;
-    private UUID purchaseDetailsId;
+    private UUID paymentDetailsId;
     private List<Book> books;
 }
