@@ -4,11 +4,13 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestClientResponseException;
 
 import com.adproc8.booku.cart.dto.BookIdsDto;
 import com.adproc8.booku.cart.dto.GetCartResponseDto;
@@ -21,6 +23,8 @@ import com.adproc8.booku.cart.service.CartService;
 @RequestMapping("/cart")
 class CartController {
 
+    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
+
     private final CartService cartService;
 
     @Autowired
@@ -29,14 +33,19 @@ class CartController {
     }
 
     @GetMapping("")
-    @ResponseStatus(HttpStatus.OK)
-    GetCartResponseDto getCart(
+    ResponseEntity<GetCartResponseDto> getCart(
         @AuthenticationPrincipal User user,
         @RequestHeader("Authorization") String authHeader)
     {
         UUID userId = user.getId();
 
-        Cart cart = cartService.findByUserId(userId, authHeader);
+        Cart cart;
+        try {
+            cart = cartService.findByUserId(userId, authHeader);
+        } catch (RestClientResponseException exception) {
+            logger.error(exception.getMessage(), exception);
+            return ResponseEntity.internalServerError().build();
+        }
 
         GetCartResponseDto cartDto = GetCartResponseDto.builder()
                 .cartId(cart.getId())
@@ -47,7 +56,7 @@ class CartController {
                 .books(cart.getBooks())
                 .build();
 
-        return cartDto;
+        return ResponseEntity.ok().body(cartDto);
     }
 
     @PatchMapping("/add-books")
@@ -65,12 +74,23 @@ class CartController {
         Set<UUID> bookIdsToAdd = dtoBookIds.get();
 
         UUID userId = user.getId();
-        Cart cart = cartService.findByUserId(userId, authHeader);
+        Cart cart;
+        try {
+            cart = cartService.findByUserId(userId, authHeader);
+        } catch (RestClientResponseException exception) {
+            logger.error(exception.getMessage(), exception);
+            return ResponseEntity.internalServerError().build();
+        }
 
         Set<UUID> currentBookIds = cart.getBookIds();
         currentBookIds.addAll(bookIdsToAdd);
 
-        cartService.save(cart, authHeader);
+        try {
+            cartService.save(cart, authHeader);
+        } catch (RestClientResponseException exception) {
+            logger.error(exception.getMessage(), exception);
+            return ResponseEntity.internalServerError().build();
+        }
 
         return ResponseEntity.ok().build();
     }
@@ -90,12 +110,23 @@ class CartController {
         Set<UUID> bookIdsToRemove = dtoBookIds.get();
 
         UUID userId = user.getId();
-        Cart cart = cartService.findByUserId(userId, authHeader);
+        Cart cart;
+        try {
+            cart = cartService.findByUserId(userId, authHeader);
+        } catch (RestClientResponseException exception) {
+            logger.error(exception.getMessage(), exception);
+            return ResponseEntity.internalServerError().build();
+        }
 
         Set<UUID> currentBookIds = cart.getBookIds();
         currentBookIds.removeAll(bookIdsToRemove);
 
-        cartService.save(cart, authHeader);
+        try {
+            cartService.save(cart, authHeader);
+        } catch (RestClientResponseException exception) {
+            logger.error(exception.getMessage(), exception);
+            return ResponseEntity.internalServerError().build();
+        }
 
         return ResponseEntity.ok().build();
     }
