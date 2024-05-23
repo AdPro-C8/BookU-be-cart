@@ -16,7 +16,7 @@ import lombok.*;
 @Entity
 @Getter @Setter @Builder
 @NoArgsConstructor @AllArgsConstructor
-public class Checkout {
+public class PurchaseDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

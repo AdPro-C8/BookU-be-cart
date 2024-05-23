@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import com.adproc8.booku.cart.dto.BookIdsDto;
 import com.adproc8.booku.cart.dto.GetCartResponseDto;
 import com.adproc8.booku.cart.model.Cart;
-import com.adproc8.booku.cart.model.Checkout;
+import com.adproc8.booku.cart.model.PurchaseDetails;
 import com.adproc8.booku.cart.model.User;
 import com.adproc8.booku.cart.service.CartService;
 
@@ -47,8 +47,8 @@ class CartController {
         GetCartResponseDto cartDto = GetCartResponseDto.builder()
                 .cartId(cart.getId())
                 .userId(userId)
-                .checkoutId(Optional.ofNullable(cart.getCheckout())
-                        .map(Checkout::getId)
+                .purchaseDetailsId(Optional.ofNullable(cart.getPurchaseDetails())
+                        .map(PurchaseDetails::getId)
                         .orElse(null))
                 .books(cart.getBooks())
                 .build();
