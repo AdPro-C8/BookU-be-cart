@@ -88,4 +88,25 @@ class PurchaseDetailsController {
 
         return ResponseEntity.ok().body(responseDto);
     }
+
+    @DeleteMapping("/{purchaseDetailsId}")
+    ResponseEntity<Void> deletePurchaseDetails(
+        @PathVariable UUID purchaseDetailsId,
+        @AuthenticationPrincipal User user)
+    {
+        PurchaseDetails purchaseDetails = purchaseDetailsService
+                .findById(purchaseDetailsId)
+                .orElseThrow();
+        UUID purchaseDetailsUserId = purchaseDetails
+                .getCart()
+                .getUserId();
+        UUID userId = user.getId();
+
+        if (!userId.equals(purchaseDetailsUserId))
+            return ResponseEntity.notFound().build();
+
+        purchaseDetailsService.deleteById(purchaseDetailsId);
+
+        return ResponseEntity.ok().build();
+    }
 }
