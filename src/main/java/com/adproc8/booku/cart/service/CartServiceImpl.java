@@ -2,7 +2,9 @@ package com.adproc8.booku.cart.service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +22,7 @@ class CartServiceImpl implements CartService {
 
     private static final ParameterizedTypeReference<List<Book>> BOOK_LIST_TYPE =
             new ParameterizedTypeReference<List<Book>>() {};
-    private static final String BOOK_GET_BATCH_PATH = "/book/get-batch";
+    private static final String BOOK_GET_BATCH_PATH = "/book/get-multiple";
 
     private final String getBooksByIdEndpoint;
     private final CartRepository cartRepository;
@@ -37,8 +39,8 @@ class CartServiceImpl implements CartService {
         getBooksByIdEndpoint = bookListHost + BOOK_GET_BATCH_PATH;
     }
 
-    private Cart populateWithBooks(Cart cart, String authHeader) {
-        List<Book> cartBooks = restClient.post()
+    private List<Book> findBooksByCart(Cart cart, String authHeader) {
+        List<Book> books = restClient.post()
                 .uri(getBooksByIdEndpoint)
                 .header("Authorization", authHeader)
                 .body(new BookIdsDto(cart.getBookIds()))
@@ -46,12 +48,21 @@ class CartServiceImpl implements CartService {
                 .toEntity(BOOK_LIST_TYPE)
                 .getBody();
 
-        cart.setBooks(cartBooks);
-
-        return cart;
+        return books;
     }
 
-    public Cart save(Cart cart) throws IllegalArgumentException {
+    public Cart save(Cart cart, String authHeader) throws IllegalArgumentException {
+        List<Book> books = findBooksByCart(cart, authHeader);
+        Set<UUID> bookIds = books.stream()
+                .map(Book::getId)
+                .collect(Collectors.toSet());
+
+        Set<UUID> cartBookIds = cart.getBookIds()
+                .stream()
+                .filter(bookId -> bookIds.contains(bookId))
+                .collect(Collectors.toSet());
+        cart.setBookIds(cartBookIds);
+
         return cartRepository.save(cart);
     }
 
@@ -64,7 +75,10 @@ class CartServiceImpl implements CartService {
             return result;
         }
 
-        Cart cart = populateWithBooks(result.get(), authHeader);
+        Cart cart = result.get();
+
+        List<Book> books = findBooksByCart(cart, authHeader);
+        cart.setBooks(books);
 
         return Optional.of(cart);
     }
@@ -78,7 +92,10 @@ class CartServiceImpl implements CartService {
             return result;
         }
 
-        Cart cart = populateWithBooks(result.get(), authHeader);
+        Cart cart = result.get();
+
+        List<Book> books = findBooksByCart(cart, authHeader);
+        cart.setBooks(books);
 
         return Optional.of(cart);
     }

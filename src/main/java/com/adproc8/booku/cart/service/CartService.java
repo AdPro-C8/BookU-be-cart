@@ -6,7 +6,7 @@ import java.util.UUID;
 import com.adproc8.booku.cart.model.Cart;
 
 public interface CartService {
-    Cart save(Cart cart);
+    Cart save(Cart cart, String authHeader);
     Optional<Cart> findById(UUID cartId, String authHeader);
     Optional<Cart> findByUserId(UUID userId, String authHeader);
     void deleteById(UUID cartId);

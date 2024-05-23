@@ -6,6 +6,7 @@ import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ class CartController {
                 Cart newCart = Cart.builder()
                     .userId(userId)
                     .build();
-                return cartService.save(newCart);
+                return cartService.save(newCart, authHeader);
             });
 
         GetCartResponseDto cartDto = GetCartResponseDto.builder()
@@ -56,52 +57,64 @@ class CartController {
     }
 
     @PatchMapping("/add-books")
-    @ResponseStatus(HttpStatus.OK)
-    void addBookToCart(
+    ResponseEntity<Void> addBookToCart(
         @AuthenticationPrincipal User user,
         @RequestHeader("Authorization") String authHeader,
         @RequestBody BookIdsDto dto)
     {
-        Set<UUID> bookIdsToAdd = dto.getBookIds(); 
+        Optional<Set<UUID>> dtoBookIds = Optional.ofNullable(dto.getBookIds());
+
+        if (dtoBookIds.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        Set<UUID> bookIdsToAdd = dtoBookIds.get();
 
         UUID userId = user.getId();
-
         Cart cart = cartService.findByUserId(userId, authHeader)
             .orElseGet(() -> {
                 Cart newCart = Cart.builder()
                     .userId(userId)
                     .build();
-                return cartService.save(newCart);
+                return cartService.save(newCart, authHeader);
             });
 
         Set<UUID> currentBookIds = cart.getBookIds();
         currentBookIds.addAll(bookIdsToAdd);
 
-        cartService.save(cart);
+        cartService.save(cart, authHeader);
+
+        return ResponseEntity.ok().build();
     }
 
     @PatchMapping("/remove-books")
-    @ResponseStatus(HttpStatus.OK)
-    void removeBookFromCart(
+    ResponseEntity<Void> removeBookFromCart(
         @AuthenticationPrincipal User user,
         @RequestHeader("Authorization") String authHeader,
         @RequestBody BookIdsDto dto)
     {
-        Set<UUID> bookIdsToRemove = dto.getBookIds(); 
+        Optional<Set<UUID>> dtoBookIds = Optional.ofNullable(dto.getBookIds());
+
+        if (dtoBookIds.isEmpty()) {
+            return ResponseEntity.badRequest().build();
+        }
+        
+        Set<UUID> bookIdsToRemove = dtoBookIds.get();
 
         UUID userId = user.getId();
-
         Cart cart = cartService.findByUserId(userId, authHeader)
             .orElseGet(() -> {
                 Cart newCart = Cart.builder()
                     .userId(userId)
                     .build();
-                return cartService.save(newCart);
+                return cartService.save(newCart, authHeader);
             });
 
         Set<UUID> currentBookIds = cart.getBookIds();
         currentBookIds.removeAll(bookIdsToRemove);
 
-        cartService.save(cart);
+        cartService.save(cart, authHeader);
+
+        return ResponseEntity.ok().build();
     }
 }
