@@ -36,13 +36,7 @@ class CartController {
     {
         UUID userId = user.getId();
 
-        Cart cart = cartService.findByUserId(userId, authHeader)
-            .orElseGet(() -> {
-                Cart newCart = Cart.builder()
-                    .userId(userId)
-                    .build();
-                return cartService.save(newCart, authHeader);
-            });
+        Cart cart = cartService.findByUserId(userId, authHeader);
 
         GetCartResponseDto cartDto = GetCartResponseDto.builder()
                 .cartId(cart.getId())
@@ -71,13 +65,7 @@ class CartController {
         Set<UUID> bookIdsToAdd = dtoBookIds.get();
 
         UUID userId = user.getId();
-        Cart cart = cartService.findByUserId(userId, authHeader)
-            .orElseGet(() -> {
-                Cart newCart = Cart.builder()
-                    .userId(userId)
-                    .build();
-                return cartService.save(newCart, authHeader);
-            });
+        Cart cart = cartService.findByUserId(userId, authHeader);
 
         Set<UUID> currentBookIds = cart.getBookIds();
         currentBookIds.addAll(bookIdsToAdd);
@@ -102,13 +90,7 @@ class CartController {
         Set<UUID> bookIdsToRemove = dtoBookIds.get();
 
         UUID userId = user.getId();
-        Cart cart = cartService.findByUserId(userId, authHeader)
-            .orElseGet(() -> {
-                Cart newCart = Cart.builder()
-                    .userId(userId)
-                    .build();
-                return cartService.save(newCart, authHeader);
-            });
+        Cart cart = cartService.findByUserId(userId, authHeader);
 
         Set<UUID> currentBookIds = cart.getBookIds();
         currentBookIds.removeAll(bookIdsToRemove);

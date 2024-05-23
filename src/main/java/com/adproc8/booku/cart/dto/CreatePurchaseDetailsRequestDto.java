@@ -3,6 +3,6 @@ package com.adproc8.booku.cart.dto;
 import lombok.Getter;
 
 @Getter
-public class PurchaseDetailsRequestDto {
+public class CreatePurchaseDetailsRequestDto {
     private String deliveryAddress;
 }

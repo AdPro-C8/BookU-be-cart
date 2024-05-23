@@ -83,13 +83,16 @@ class CartServiceImpl implements CartService {
         return Optional.of(cart);
     }
 
-    public Optional<Cart> findByUserId(UUID userId, String authHeader)
+    public Cart findByUserId(UUID userId, String authHeader)
     throws IllegalArgumentException
     {
         Optional<Cart> result = cartRepository.findByUserId(userId);
 
         if (result.isEmpty()) {
-            return result;
+            Cart cart = Cart.builder()
+                    .userId(userId)
+                    .build();
+            return save(cart, authHeader);
         }
 
         Cart cart = result.get();
@@ -97,7 +100,7 @@ class CartServiceImpl implements CartService {
         List<Book> books = findBooksByCart(cart, authHeader);
         cart.setBooks(books);
 
-        return Optional.of(cart);
+        return cart;
     }
 
     public void deleteById(UUID cartId) throws IllegalArgumentException {

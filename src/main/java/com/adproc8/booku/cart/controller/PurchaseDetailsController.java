@@ -8,7 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import com.adproc8.booku.cart.dto.PurchaseDetailsRequestDto;
+import com.adproc8.booku.cart.dto.CreatePurchaseDetailsRequestDto;
 import com.adproc8.booku.cart.model.Cart;
 import com.adproc8.booku.cart.model.PurchaseDetails;
 import com.adproc8.booku.cart.model.User;
@@ -52,14 +52,12 @@ class PurchaseDetailsController {
     @ResponseStatus(HttpStatus.OK)
     PurchaseDetails createPurchaseDetails(
         @RequestHeader("Authorization") String authHeader,
-        @RequestBody PurchaseDetailsRequestDto purchaseDetailsDto,
+        @RequestBody CreatePurchaseDetailsRequestDto purchaseDetailsDto,
         @AuthenticationPrincipal User user)
     {
         String deliveryAddress = purchaseDetailsDto.getDeliveryAddress();
 
-        Cart cart = cartService
-            .findByUserId(user.getId(), authHeader)
-            .orElseThrow();
+        Cart cart = cartService.findByUserId(user.getId(), authHeader);
 
         PurchaseDetails purchaseDetails = PurchaseDetails.builder()
             .deliveryAddress(deliveryAddress)
