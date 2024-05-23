@@ -8,4 +8,5 @@ import com.adproc8.booku.cart.model.PurchaseDetails;
 public interface PurchaseDetailsService {
     PurchaseDetails save(PurchaseDetails purchaseDetails);
     Optional<PurchaseDetails> findById(UUID id);
+    void deleteById(UUID id);
 }

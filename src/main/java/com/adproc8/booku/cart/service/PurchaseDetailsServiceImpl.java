@@ -29,4 +29,8 @@ public class PurchaseDetailsServiceImpl implements PurchaseDetailsService {
     public Optional<PurchaseDetails> findById(UUID id) throws IllegalArgumentException {
         return purchaseDetailsRepository.findById(id);
     }
+
+    public void deleteById(UUID id) throws IllegalArgumentException {
+        purchaseDetailsRepository.deleteById(id);
+    }
 }
