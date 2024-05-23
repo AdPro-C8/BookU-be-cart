@@ -30,7 +30,15 @@ public class PaymentDetailsServiceImpl implements PaymentDetailsService {
         return paymentDetailsRepository.findById(id);
     }
 
+    public Optional<PaymentDetails> findByUserId(UUID userId) throws IllegalArgumentException {
+        return paymentDetailsRepository.findByCart_UserId(userId);
+    }
+
     public void deleteById(UUID id) throws IllegalArgumentException {
         paymentDetailsRepository.deleteById(id);
+    }
+
+    public void deleteByUserId(UUID userId) throws IllegalArgumentException {
+        paymentDetailsRepository.deleteByCart_UserId(userId);
     }
 }

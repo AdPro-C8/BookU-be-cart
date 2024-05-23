@@ -32,26 +32,22 @@ class PaymentDetailsController {
     private final PaymentDetailsService paymentDetailsService;
 
     @Autowired
-    PaymentDetailsController(CartService cartService, PaymentDetailsService paymentDetailsService) {
+    PaymentDetailsController(
+        CartService cartService,
+        PaymentDetailsService paymentDetailsService)
+    {
         this.cartService = cartService;
         this.paymentDetailsService = paymentDetailsService;
     }
 
-    @GetMapping("/{paymentDetailsId}")
-    ResponseEntity<PaymentDetails> getPaymentDetailsById(
-        @PathVariable UUID paymentDetailsId,
+    @GetMapping("")
+    ResponseEntity<PaymentDetails> getPaymentDetails(
         @AuthenticationPrincipal User user)
     {
-        PaymentDetails paymentDetails = paymentDetailsService
-                .findById(paymentDetailsId)
-                .orElseThrow();
-        UUID paymentDetailsUserId = paymentDetails
-                .getCart()
-                .getUserId();
         UUID userId = user.getId();
-
-        if (!userId.equals(paymentDetailsUserId))
-            return ResponseEntity.notFound().build();
+        PaymentDetails paymentDetails = paymentDetailsService
+                .findByUserId(userId)
+                .orElseThrow();
 
         return ResponseEntity.ok(paymentDetails);
     }
@@ -97,44 +93,26 @@ class PaymentDetailsController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @DeleteMapping("/{paymentDetailsId}")
-    ResponseEntity<Void> deletePaymentDetailsById(
-        @PathVariable UUID paymentDetailsId,
+    @DeleteMapping("")
+    ResponseEntity<Void> deletePaymentDetails(
         @AuthenticationPrincipal User user)
     {
-        PaymentDetails paymentDetails = paymentDetailsService
-                .findById(paymentDetailsId)
-                .orElseThrow();
-        UUID paymentDetailsUserId = paymentDetails
-                .getCart()
-                .getUserId();
         UUID userId = user.getId();
-
-        if (!userId.equals(paymentDetailsUserId))
-            return ResponseEntity.notFound().build();
-
-        paymentDetailsService.deleteById(paymentDetailsId);
+        paymentDetailsService.deleteByUserId(userId);
 
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("/{paymentDetailsId}")
-    ResponseEntity<Void> updatePaymentDetailsById(
+    @PatchMapping("")
+    ResponseEntity<Void> updatePaymentDetails(
         @PathVariable UUID paymentDetailsId,
         @AuthenticationPrincipal User user,
         @RequestBody UpdatePaymentDetailsRequestDto paymentDetailsDto)
     {
-        PaymentDetails paymentDetails = paymentDetailsService
-                .findById(paymentDetailsId)
-                .orElseThrow();
-                
-        UUID paymentDetailsUserId = paymentDetails
-                .getCart()
-                .getUserId();
         UUID userId = user.getId();
-
-        if (!userId.equals(paymentDetailsUserId))
-            return ResponseEntity.notFound().build();
+        PaymentDetails paymentDetails = paymentDetailsService
+                .findByUserId(userId)
+                .orElseThrow();
 
         Optional.ofNullable(paymentDetailsDto.getDeliveryAddress())
                 .ifPresent(deliveryAddress -> paymentDetails.setDeliveryAddress(deliveryAddress));
