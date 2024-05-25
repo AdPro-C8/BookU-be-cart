@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestClientException;
 
 import com.adproc8.booku.cart.dto.CreatePaymentDetailsRequestDto;
 import com.adproc8.booku.cart.dto.CreatePaymentDetailsResponseDto;
@@ -69,7 +69,7 @@ class PaymentDetailsController {
         Cart cart;
         try {
             cart = cartService.findByUserId(user.getId(), authHeader);
-        } catch (RestClientResponseException exception) {
+        } catch (RestClientException exception) {
             logger.error(exception.getMessage(), exception);
             return ResponseEntity.internalServerError().build();
         }

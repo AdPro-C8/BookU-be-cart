@@ -23,7 +23,7 @@ public class Cart {
     @OneToOne(mappedBy = "cart", fetch = FetchType.LAZY)
     private PaymentDetails paymentDetails;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     @Builder.Default
     private Set<UUID> bookIds = new HashSet<>();
 

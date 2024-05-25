@@ -23,13 +23,4 @@ class ExceptionAdvice {
             HttpStatus.NOT_FOUND, ex.getMessage());
         return errorResponse;
     }
-
-    @ExceptionHandler(Exception.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    ErrorResponse handleException(Exception ex) {
-        logger.error(ex.getMessage(), ex);
-        ErrorResponse errorResponse = ErrorResponse.create(ex,
-            HttpStatus.BAD_REQUEST, ex.getMessage());
-        return errorResponse;
-    }
 }

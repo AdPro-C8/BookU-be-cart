@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestClientException;
 
 import com.adproc8.booku.cart.dto.BookIdsDto;
 import com.adproc8.booku.cart.dto.GetCartResponseDto;
@@ -42,7 +42,7 @@ class CartController {
         Cart cart;
         try {
             cart = cartService.findByUserId(userId, authHeader);
-        } catch (RestClientResponseException exception) {
+        } catch (RestClientException exception) {
             logger.error(exception.getMessage(), exception);
             return ResponseEntity.internalServerError().build();
         }
@@ -77,7 +77,7 @@ class CartController {
         Cart cart;
         try {
             cart = cartService.findByUserId(userId, authHeader);
-        } catch (RestClientResponseException exception) {
+        } catch (RestClientException exception) {
             logger.error(exception.getMessage(), exception);
             return ResponseEntity.internalServerError().build();
         }
@@ -87,7 +87,7 @@ class CartController {
 
         try {
             cartService.save(cart, authHeader);
-        } catch (RestClientResponseException exception) {
+        } catch (RestClientException exception) {
             logger.error(exception.getMessage(), exception);
             return ResponseEntity.internalServerError().build();
         }
@@ -113,7 +113,7 @@ class CartController {
         Cart cart;
         try {
             cart = cartService.findByUserId(userId, authHeader);
-        } catch (RestClientResponseException exception) {
+        } catch (RestClientException exception) {
             logger.error(exception.getMessage(), exception);
             return ResponseEntity.internalServerError().build();
         }
@@ -123,7 +123,7 @@ class CartController {
 
         try {
             cartService.save(cart, authHeader);
-        } catch (RestClientResponseException exception) {
+        } catch (RestClientException exception) {
             logger.error(exception.getMessage(), exception);
             return ResponseEntity.internalServerError().build();
         }

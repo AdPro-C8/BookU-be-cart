@@ -11,7 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
-import org.springframework.web.client.RestClientResponseException;
+import org.springframework.web.client.RestClientException;
 
 import com.adproc8.booku.cart.dto.BookIdsDto;
 import com.adproc8.booku.cart.model.Book;
@@ -41,7 +41,7 @@ class CartServiceImpl implements CartService {
     }
 
     private List<Book> findBooksByCart(Cart cart, String authHeader)
-    throws RestClientResponseException
+    throws RestClientException
     {
         List<Book> books = restClient.post()
                 .uri(getBooksByIdEndpoint)
@@ -55,7 +55,7 @@ class CartServiceImpl implements CartService {
     }
 
     public Cart save(Cart cart, String authHeader)
-    throws RestClientResponseException
+    throws RestClientException
     {
         List<Book> books = findBooksByCart(cart, authHeader);
         Set<UUID> bookIds = books.stream()
@@ -72,7 +72,7 @@ class CartServiceImpl implements CartService {
     }
 
     public Optional<Cart> findById(UUID cartId, String authHeader)
-    throws IllegalArgumentException
+    throws IllegalArgumentException, RestClientException
     {
         Optional<Cart> result = cartRepository.findById(cartId);
 
@@ -89,7 +89,7 @@ class CartServiceImpl implements CartService {
     }
 
     public Cart findByUserId(UUID userId, String authHeader)
-    throws IllegalArgumentException, RestClientResponseException
+    throws IllegalArgumentException, RestClientException
     {
         Optional<Cart> result = cartRepository.findByUserId(userId);
 
