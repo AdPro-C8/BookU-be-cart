@@ -45,7 +45,11 @@ jobs:
           PG_HOST: jdbc:postgresql://localhost:5432/booku
           PG_USER: postgres
           PG_PASS: postgres
-          PORT: 8000
+          PORT: 8002
+          JWT_SECRET: IniAdalahSebuahSecretYangSangatAmatRahasiaSuiseinoGotokuArawaretaSutanoGensekiAidoruVtubernoHoshimachiSuiseidesuSuichanwaKYOUUMOKAWAIIIIIIPlisKaliIniBisaAsTAGAAAASHAJSAJSJHAJSDCJDJCHABisaDongPlisssDemiAllahYesusBuddhaBhagavvatGittaTriHitaKaranaSwastiastuNamoBudayaBroFrnggabisabisatfAKHIRNYAAABISAAAAOWKOKWOKWOKWOWKOWKOKokwoKWOKowkowKWOKWOkwoWKokwoKowkoKWOKowkOWKOkOWKOkwoKWOKokwoK
+          AUTH_HOST: http://localhost:8001
+          BOOKLIST_HOST: http://localhost:8000
+          HISTORY_HOST: http://localhost:8004
 
       - name: Store reports
         if: failure()
