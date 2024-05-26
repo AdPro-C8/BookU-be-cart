@@ -3,19 +3,17 @@ package com.adproc8.booku.cart.controller;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientException;
 
 import com.adproc8.booku.cart.dto.CreatePaymentDetailsRequestDto;
 import com.adproc8.booku.cart.dto.CreatePaymentDetailsResponseDto;
-import com.adproc8.booku.cart.dto.UpdatePaymentDetailsRequestDto;
+import com.adproc8.booku.cart.dto.UpdatePaymentDetailsAddressRequestDto;
+import com.adproc8.booku.cart.dto.UpdatePaymentDetailsStatusDto;
+import com.adproc8.booku.cart.enums.PaymentStatus;
 import com.adproc8.booku.cart.model.Cart;
 import com.adproc8.booku.cart.model.PaymentDetails;
 import com.adproc8.booku.cart.model.User;
@@ -25,8 +23,6 @@ import com.adproc8.booku.cart.service.PaymentDetailsService;
 @RestController
 @RequestMapping("/payment")
 class PaymentDetailsController {
-
-    private static final Logger logger = LoggerFactory.getLogger(PaymentDetailsController.class);
 
     private final CartService cartService;
     private final PaymentDetailsService paymentDetailsService;
@@ -41,15 +37,14 @@ class PaymentDetailsController {
     }
 
     @GetMapping("")
-    ResponseEntity<PaymentDetails> getPaymentDetails(
-        @AuthenticationPrincipal User user)
-    {
+    @ResponseStatus(HttpStatus.OK)
+    PaymentDetails getPaymentDetails(@AuthenticationPrincipal User user) {
         UUID userId = user.getId();
         PaymentDetails paymentDetails = paymentDetailsService
                 .findByUserId(userId)
                 .orElseThrow();
 
-        return ResponseEntity.ok(paymentDetails);
+        return paymentDetails;
     }
 
     @PostMapping("")
@@ -58,6 +53,7 @@ class PaymentDetailsController {
         @RequestBody CreatePaymentDetailsRequestDto paymentDetailsDto,
         @AuthenticationPrincipal User user)
     {
+        UUID userId = user.getId();
         Optional<String> optionalDeliveryAddress =
                 Optional.ofNullable(paymentDetailsDto.getDeliveryAddress());
 
@@ -66,25 +62,14 @@ class PaymentDetailsController {
 
         String deliveryAddress = paymentDetailsDto.getDeliveryAddress();
 
-        Cart cart;
-        try {
-            cart = cartService.findByUserId(user.getId(), authHeader);
-        } catch (RestClientException exception) {
-            logger.error(exception.getMessage(), exception);
-            return ResponseEntity.internalServerError().build();
-        }
+        Cart cart = cartService.findByUserId(userId, authHeader);
 
         PaymentDetails paymentDetails = PaymentDetails.builder()
                 .deliveryAddress(deliveryAddress)
                 .cart(cart)
                 .build();
 
-        try {
-            paymentDetails = paymentDetailsService.save(paymentDetails);
-        } catch (DataIntegrityViolationException exception) {
-            logger.error(exception.getMessage(), exception);
-            return ResponseEntity.status(HttpStatus.CONFLICT).build();
-        }
+        paymentDetails = paymentDetailsService.save(paymentDetails);
 
         UUID paymentDetailsId = paymentDetails.getId();
         CreatePaymentDetailsResponseDto responseDto =
@@ -93,21 +78,18 @@ class PaymentDetailsController {
         return ResponseEntity.ok().body(responseDto);
     }
 
-    @DeleteMapping("")
-    ResponseEntity<Void> deletePaymentDetails(
-        @AuthenticationPrincipal User user)
-    {
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.OK)
+    void deletePaymentDetails(@PathVariable UUID id, @AuthenticationPrincipal User user) {
         UUID userId = user.getId();
-        paymentDetailsService.deleteByUserId(userId);
-
-        return ResponseEntity.ok().build();
+        paymentDetailsService.deleteByIdAndUserId(id, userId);
     }
 
-    @PatchMapping("")
-    ResponseEntity<Void> updatePaymentDetails(
-        @PathVariable UUID paymentDetailsId,
+    @PatchMapping("/address")
+    @ResponseStatus(HttpStatus.OK)
+    void updatePaymentDetailsAddress(
         @AuthenticationPrincipal User user,
-        @RequestBody UpdatePaymentDetailsRequestDto paymentDetailsDto)
+        @RequestBody UpdatePaymentDetailsAddressRequestDto paymentDetailsDto)
     {
         UUID userId = user.getId();
         PaymentDetails paymentDetails = paymentDetailsService
@@ -116,10 +98,33 @@ class PaymentDetailsController {
 
         Optional.ofNullable(paymentDetailsDto.getDeliveryAddress())
                 .ifPresent(deliveryAddress -> paymentDetails.setDeliveryAddress(deliveryAddress));
-        Optional.ofNullable(paymentDetailsDto.getPaymentStatus())
-                .ifPresent(paymentStatus -> paymentDetails.setPaymentStatus(paymentStatus));
 
         paymentDetailsService.save(paymentDetails);
+    }
+
+    @PatchMapping("/status")
+    ResponseEntity<Void> updatePaymentDetailsStatus(
+        @AuthenticationPrincipal User user,
+        @RequestHeader("Authorization") String authHeader,
+        @RequestBody UpdatePaymentDetailsStatusDto paymentDetailsDto)
+    {
+        UUID userId = user.getId();
+        Optional<String> optionalStatusString =
+                Optional.ofNullable(paymentDetailsDto.getPaymentStatus());
+
+        if (optionalStatusString.isEmpty())
+            return ResponseEntity.badRequest().build();
+
+        String statusString = optionalStatusString.get();
+        PaymentStatus status = PaymentStatus.valueOf(statusString);
+
+        PaymentDetails paymentDetails = paymentDetailsService
+                .findByUserId(userId)
+                .orElseThrow();
+
+        paymentDetails.setPaymentStatus(status);
+
+        paymentDetailsService.save(paymentDetails, authHeader);
 
         return ResponseEntity.ok().build();
     }

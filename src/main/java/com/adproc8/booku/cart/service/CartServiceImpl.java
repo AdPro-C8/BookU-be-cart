@@ -21,11 +21,12 @@ import com.adproc8.booku.cart.repository.CartRepository;
 @Service
 class CartServiceImpl implements CartService {
 
+    private static final String BOOK_GET_BATCH_PATH = "/book/get-multiple";
     private static final ParameterizedTypeReference<List<Book>> BOOK_LIST_TYPE =
             new ParameterizedTypeReference<List<Book>>() {};
-    private static final String BOOK_GET_BATCH_PATH = "/book/get-multiple";
 
-    private final String getBooksByIdEndpoint;
+    private final String bookListHost;
+
     private final CartRepository cartRepository;
     private final RestClient restClient;
 
@@ -37,14 +38,14 @@ class CartServiceImpl implements CartService {
     {
         this.cartRepository = cartRepository;
         this.restClient = restClient;
-        getBooksByIdEndpoint = bookListHost + BOOK_GET_BATCH_PATH;
+        this.bookListHost = bookListHost;
     }
 
     private List<Book> findBooksByCart(Cart cart, String authHeader)
     throws RestClientException
     {
         List<Book> books = restClient.post()
-                .uri(getBooksByIdEndpoint)
+                .uri(bookListHost + BOOK_GET_BATCH_PATH)
                 .header("Authorization", authHeader)
                 .body(new BookIdsDto(cart.getBookIds()))
                 .retrieve()
@@ -71,10 +72,10 @@ class CartServiceImpl implements CartService {
         return cartRepository.save(cart);
     }
 
-    public Optional<Cart> findById(UUID cartId, String authHeader)
-    throws IllegalArgumentException, RestClientException
+    public Optional<Cart> findById(UUID id, String authHeader)
+    throws RestClientException
     {
-        Optional<Cart> result = cartRepository.findById(cartId);
+        Optional<Cart> result = cartRepository.findById(id);
 
         if (result.isEmpty()) {
             return result;
@@ -89,7 +90,7 @@ class CartServiceImpl implements CartService {
     }
 
     public Cart findByUserId(UUID userId, String authHeader)
-    throws IllegalArgumentException, RestClientException
+    throws RestClientException
     {
         Optional<Cart> result = cartRepository.findByUserId(userId);
 
@@ -108,7 +109,7 @@ class CartServiceImpl implements CartService {
         return cart;
     }
 
-    public void deleteById(UUID cartId) throws IllegalArgumentException {
+    public void deleteById(UUID cartId) {
         cartRepository.deleteById(cartId);
     }
 }

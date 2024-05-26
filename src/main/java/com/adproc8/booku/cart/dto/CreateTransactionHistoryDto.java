@@ -1,16 +1,16 @@
 package com.adproc8.booku.cart.dto;
 
+import java.sql.Date;
 import java.util.List;
 import java.util.UUID;
-
-import com.adproc8.booku.cart.model.Book;
 
 import lombok.Builder;
 import lombok.Getter;
 
 @Getter @Builder
-public class GetCartResponseDto {
-    private UUID cartId;
+public class CreateTransactionHistoryDto {
+    private List<UUID> bookIds;
     private UUID userId;
-    private List<Book> books;
+    private Date purchaseDate;
+    private int totalPrice;
 }

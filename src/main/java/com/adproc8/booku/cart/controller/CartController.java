@@ -4,26 +4,21 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.RestClientException;
 
 import com.adproc8.booku.cart.dto.BookIdsDto;
 import com.adproc8.booku.cart.dto.GetCartResponseDto;
 import com.adproc8.booku.cart.model.Cart;
-import com.adproc8.booku.cart.model.PaymentDetails;
 import com.adproc8.booku.cart.model.User;
 import com.adproc8.booku.cart.service.CartService;
 
 @RestController
 @RequestMapping("/cart")
 class CartController {
-
-    private static final Logger logger = LoggerFactory.getLogger(CartController.class);
 
     private final CartService cartService;
 
@@ -33,30 +28,22 @@ class CartController {
     }
 
     @GetMapping("")
-    ResponseEntity<GetCartResponseDto> getCart(
+    @ResponseStatus(HttpStatus.OK)
+    GetCartResponseDto getCart(
         @AuthenticationPrincipal User user,
         @RequestHeader("Authorization") String authHeader)
     {
         UUID userId = user.getId();
 
-        Cart cart;
-        try {
-            cart = cartService.findByUserId(userId, authHeader);
-        } catch (RestClientException exception) {
-            logger.error(exception.getMessage(), exception);
-            return ResponseEntity.internalServerError().build();
-        }
+        Cart cart = cartService.findByUserId(userId, authHeader);
 
         GetCartResponseDto cartDto = GetCartResponseDto.builder()
                 .cartId(cart.getId())
                 .userId(userId)
-                .paymentDetailsId(Optional.ofNullable(cart.getPaymentDetails())
-                        .map(PaymentDetails::getId)
-                        .orElse(null))
                 .books(cart.getBooks())
                 .build();
 
-        return ResponseEntity.ok().body(cartDto);
+        return cartDto;
     }
 
     @PatchMapping("/add-books")
@@ -74,23 +61,12 @@ class CartController {
         Set<UUID> bookIdsToAdd = dtoBookIds.get();
 
         UUID userId = user.getId();
-        Cart cart;
-        try {
-            cart = cartService.findByUserId(userId, authHeader);
-        } catch (RestClientException exception) {
-            logger.error(exception.getMessage(), exception);
-            return ResponseEntity.internalServerError().build();
-        }
+        Cart cart = cartService.findByUserId(userId, authHeader);
 
         Set<UUID> currentBookIds = cart.getBookIds();
         currentBookIds.addAll(bookIdsToAdd);
 
-        try {
-            cartService.save(cart, authHeader);
-        } catch (RestClientException exception) {
-            logger.error(exception.getMessage(), exception);
-            return ResponseEntity.internalServerError().build();
-        }
+        cartService.save(cart, authHeader);
 
         return ResponseEntity.ok().build();
     }
@@ -110,23 +86,12 @@ class CartController {
         Set<UUID> bookIdsToRemove = dtoBookIds.get();
 
         UUID userId = user.getId();
-        Cart cart;
-        try {
-            cart = cartService.findByUserId(userId, authHeader);
-        } catch (RestClientException exception) {
-            logger.error(exception.getMessage(), exception);
-            return ResponseEntity.internalServerError().build();
-        }
+        Cart cart = cartService.findByUserId(userId, authHeader);
 
         Set<UUID> currentBookIds = cart.getBookIds();
         currentBookIds.removeAll(bookIdsToRemove);
 
-        try {
-            cartService.save(cart, authHeader);
-        } catch (RestClientException exception) {
-            logger.error(exception.getMessage(), exception);
-            return ResponseEntity.internalServerError().build();
-        }
+        cartService.save(cart, authHeader);
 
         return ResponseEntity.ok().build();
     }

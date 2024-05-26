@@ -17,7 +17,7 @@ public class Cart {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private UUID userId;
 
     @OneToOne(mappedBy = "cart", fetch = FetchType.LAZY)
@@ -26,6 +26,9 @@ public class Cart {
     @ElementCollection(fetch = FetchType.LAZY)
     @Builder.Default
     private Set<UUID> bookIds = new HashSet<>();
+
+    @Builder.Default
+    private boolean active = true;
 
     @Transient
     @Builder.Default
